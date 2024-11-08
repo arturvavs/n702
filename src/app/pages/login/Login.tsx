@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Parse from "parse/dist/parse.min.js";
+import axios from 'axios';
+//import Parse from "parse/dist/parse.min.js";
 import {
   FormControl,
   IconButton,
@@ -18,13 +19,18 @@ export const Login: React.FC = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  {/*handleLogin: função simples que realiza o login na aplicação, validando através do Parse.User.logIn o usuário e senha cadastradas na tabela _User do Back4App */}
+  {/*handleLogin: função simples que realiza o login na aplicação, validação de usuário e senha fica no backend */}
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const user = await Parse.User.logIn(username, password);
-      console.log("Usuário autenticado:", user);
-      navigate("/gerenciamento");
+      // Enviar requisição para o backend
+      const response = await axios.post("http://127.0.0.1:8000/login", {
+        username,
+        password
+      });
+
+      console.log(response)
+      navigate("/agendamento");
     } catch (err) {
       setError("Falha no login. Verifique suas credenciais.");
     }

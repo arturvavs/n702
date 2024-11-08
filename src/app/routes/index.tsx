@@ -9,7 +9,7 @@ export const Routes = () => {
     return (
         <BrowserRouter>
             <Switch>
-                <Route path ="/" element={<Login />}/>
+                <Route path ="/login" element={<Login />}/>
                 <Route path ="/gerenciamento" element={<PrivateRoute><UserPager /></PrivateRoute>}/>
                 <Route path ="/cadastroUsuario" element={<CadastroUsuario />}/>
                 <Route path ="/agendamento" element={<Agendamento />} />
