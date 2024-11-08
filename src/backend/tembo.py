@@ -6,9 +6,11 @@ import datetime
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from passlib.context import CryptContext
+import os
+from dotenv import load_dotenv
 
 app = FastAPI()
-DATABASE_URL = "postgresql://postgres:2HX65AhhiJCMXfTt@pointedly-ideal-satyr.data-1.use1.tembo.io:5432/postgres"
+DATABASE_URL = os.getenv("URL")
 
 origins = ["http://localhost:5173"]
 app.add_middleware(
