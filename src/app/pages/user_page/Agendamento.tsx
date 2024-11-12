@@ -5,7 +5,8 @@ import { StaticDatePicker } from "@mui/x-date-pickers/StaticDatePicker";
 import { ptBR } from "date-fns/locale";
 import { ptBR as ptBRPicker } from "@mui/x-date-pickers/locales";
 import { Button, Card, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, List, ListItemButton, ListItemText, Typography } from "@mui/material";
-import Parse from "parse/dist/parse.min.js";
+import {format} from "date-fns/format";
+import { getAvailableTimes } from "../../authService";
 
 export const Agendamento: React.FC = () => {
   const [selectedDate, setSelectedDate] = React.useState<Date | null>(null);
@@ -13,36 +14,24 @@ export const Agendamento: React.FC = () => {
   const [selectedHorario, setSelectedHorario] = React.useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
-  // Buscar horários disponíveis que estão como 'True' no Back4App
+  // Função para buscar horários disponíveis no backend
   const fetchHorariosDisponiveis = async (date: Date) => {
-    const Agenda = Parse.Object.extend("Agenda");
-    const query = new Parse.Query(Agenda);
-
-    // Tratamento para considerar somente a DATA selecionada no Back4App (aqui foi chatgpt)
-    const startOfDay = new Date(date);
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
-
-    // Filtro de StatusAgenda e DataAgenda no intervalo do dia (aqui foi chatgpt)
-    query.equalTo("StatusAgenda", true);
-    query.greaterThanOrEqualTo("DataAgenda", startOfDay);
-    query.lessThanOrEqualTo("DataAgenda", endOfDay);
-    query.ascending("HoraAgenda");
-
+    const formattedDate = format(date, "yyyy-MM-dd"); // Formata a data para o formato YYYY-MM-DD
     try {
-      const results = await query.find();
-      const horarios = results.map((result: any) => result.get("HoraAgenda"));
-      setHorariosDisponiveis(horarios);
+      const horarios = await getAvailableTimes(formattedDate); // Passa apenas a data formatada para a função
+      setHorariosDisponiveis(horarios); // Atualiza o estado com os horários recebidos
     } catch (error) {
       console.error("Erro ao buscar horários disponíveis:", error);
+      setHorariosDisponiveis([]); // Limpa os horários em caso de erro
     }
   };
 
+  // Atualizar data e buscar horários ao selecionar uma data
   const handleChangeDate = (date: Date | null) => {
     setSelectedDate(date);
     if (date) fetchHorariosDisponiveis(date);
   };
+
   const handleHorarioClick = (horario: string) => {
     setSelectedHorario(horario);
     setIsModalOpen(true);
@@ -68,11 +57,7 @@ export const Agendamento: React.FC = () => {
         </Typography>
         <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 30 }}>
           <div style={{ flex: 1 }}>
-            <LocalizationProvider
-              dateAdapter={AdapterDateFns}
-              adapterLocale={ptBR}
-              localeText={ptBRPicker.components.MuiLocalizationProvider.defaultProps.localeText}
-            >
+            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR} localeText={ptBRPicker.components.MuiLocalizationProvider.defaultProps.localeText}>
               <Card style={{ padding: 20, borderRadius: 8, boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)" }}>
                 <Typography variant="h6" align="center" style={{ marginBottom: 20 }}>
                   Selecione a Data
