@@ -1,44 +1,46 @@
 import React, { useState } from 'react';
-import Parse from 'parse/dist/parse.min.js';
-import { TextField } from '@mui/material';
+//import Parse from 'parse/dist/parse.min.js';
+import axios from 'axios';
+import { MenuItem, Select, TextField } from '@mui/material';
 import { Navigate, useNavigate } from 'react-router-dom';
 
 export const CadastroUsuario: React.FC = () => {
 
-    const [PatientName, setNome] = useState('');
-    const [Email, setEmail] = useState(''); 
-    const [BirthDate, setDataNascimento] = useState('');
-    const [CPFNumber, setCpf] = useState('');
-    const [Phone, setTelefone] = useState('');
-    const [Address, setEndereco] = useState('');
-    const [AddressNumber, setNumeroEndereco] = useState('');
-    const [Password, setPassword] = useState('');
+    const [nm_pessoa_fisica, setNome] = useState('');
+    const [ds_email, setEmail] = useState(''); 
+    const [dt_nascimento, setDataNascimento] = useState('');
+    const [nr_cpf, setCpf] = useState('');
+    const [ie_sexo, setSexo] = useState('');
+    const [nr_contato, setTelefone] = useState('');
+    const [ds_endereco, setEndereco] = useState('');
+    const [nr_numero_endereco, setNumeroEndereco] = useState('');
+    const [ds_senha, setPassword] = useState('');
+    const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
 
     const handleCadastro = async () => {
-        const user = new Parse.User();
-        user.set('PatientName', PatientName);
-        user.set('username', Email);
-        user.set('email', Email);
-        user.set('BirthDate', BirthDate ? new Date(BirthDate) : undefined);
-        user.set('CPF', CPFNumber);
-        user.set('Phone', Phone);
-        user.set('Address', Address);
-        user.set('AddressNumber', AddressNumber);
-        user.set('password', Password);
-
-        try {
-          await user.signUp();
-          alert('Usuário cadastrado com sucesso!');
-          navigate("/");
-        } catch (err) {
-          if (err instanceof Error) {
-            alert(`Erro ao cadastrar usuário:  ${err.message}`);
-          } else {
-            alert('Erro desconhecido ao cadastrar usuário.');
-          }
-          console.log(Parse.User.current());
+      try {
+        // Enviar requisição para o backend
+        const response = await axios.post("https://n702.onrender.com/cadastro", {
+          nm_pessoa_fisica,
+          ds_email,
+          dt_nascimento,
+          nr_cpf,
+          nr_contato,
+          ds_endereco,
+          nr_numero_endereco,
+          ds_senha,
+          ie_sexo
         }
+      );
+      if (response.status === 200) {
+        // Navegar para outra página ou exibir uma mensagem de sucesso
+        navigate('/Login'); // Exemplo
+      }
+      } catch (err) {
+      setError("Falha ao realizar cadastro");
+      };
+        
     };
 
 
@@ -53,7 +55,7 @@ export const CadastroUsuario: React.FC = () => {
             fullWidth
             label="Obrigatório"  
             type="text"
-            value={PatientName}
+            value={nm_pessoa_fisica}
             onChange={(e) => setNome(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded"
         />
@@ -66,7 +68,7 @@ export const CadastroUsuario: React.FC = () => {
             fullWidth
             label="Obrigatório"  
             type="email"
-            value={Email}
+            value={ds_email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded"
         />
@@ -78,7 +80,7 @@ export const CadastroUsuario: React.FC = () => {
             required
             fullWidth  
             type="date"
-            value={BirthDate}
+            value={dt_nascimento}
             onChange={(e) => setDataNascimento(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded"
         />
@@ -90,11 +92,30 @@ export const CadastroUsuario: React.FC = () => {
             required
             fullWidth
             type="text"
-            value={CPFNumber}
+            value={nr_cpf}
             label="Apenas números"
             onChange={(e) => setCpf(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded"
         />
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Sexo:</label>
+        <Select
+          required
+          fullWidth
+          value={ie_sexo}
+          onChange={(e) => setSexo(e.target.value)}
+          displayEmpty
+          className="w-full p-2 border border-gray-300 rounded"
+        >
+          <MenuItem value="" disabled>
+            Selecione o sexo
+          </MenuItem>
+          <MenuItem value="Masculino">Masculino</MenuItem>
+          <MenuItem value="Feminino">Feminino</MenuItem>
+          <MenuItem value="Indefinido">Indefinido</MenuItem>
+        </Select>
       </div>
 
       <div className="mb-4">
@@ -103,7 +124,7 @@ export const CadastroUsuario: React.FC = () => {
             required
             fullWidth 
             type="text"
-            value={Phone}
+            value={nr_contato}
             label="Apenas números"
             onChange={(e) => setTelefone(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded"
@@ -116,7 +137,7 @@ export const CadastroUsuario: React.FC = () => {
             <TextField
             required
             type="text"
-            value={Address}
+            value={ds_endereco}
             label="Endereço"
             onChange={(e) => setEndereco(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded"
@@ -129,7 +150,7 @@ export const CadastroUsuario: React.FC = () => {
             required
             fullWidth
             type="text"
-            value={AddressNumber}
+            value={nr_numero_endereco}
             label="Número"
             onChange={(e) => setNumeroEndereco(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded"
@@ -144,7 +165,7 @@ export const CadastroUsuario: React.FC = () => {
             fullWidth
             label="Obrigatório"  
             type="password"
-            value={Password}
+            value={ds_senha}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded"
         />

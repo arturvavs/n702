@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
+import { login } from '../../authService'
+import apiClient from "../../apiClient";
 //import Parse from "parse/dist/parse.min.js";
 import {
   FormControl,
@@ -17,22 +19,22 @@ export const Login: React.FC = () => {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
   {/*handleLogin: função simples que realiza o login na aplicação, validação de usuário e senha fica no backend */}
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Enviar requisição para o backend
-      const response = await axios.post("http://127.0.0.1:8000/login", {
-        username,
-        password
-      });
-
-      console.log(response)
-      navigate("/agendamento");
-    } catch (err) {
-      setError("Falha no login. Verifique suas credenciais.");
+      const data = await login(username, password);
+      console.log(data);
+      navigate("/agendamento"); // Redireciona após login bem-sucedido
+    } catch (error) {
+      // Verificar e converter o erro para o tipo Error, se possível
+      if (error instanceof Error) {
+        setError(error.message); // Usa a mensagem de erro
+      } else {
+        setError("Ocorreu um erro inesperado."); // Mensagem padrão para casos desconhecidos
+      }
     }
   };
 

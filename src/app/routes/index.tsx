@@ -11,7 +11,7 @@ export const Routes = () => {
             <Switch>
                 <Route path ="/login" element={<Login />}/>
                 <Route path ="/gerenciamento" element={<PrivateRoute><UserPager /></PrivateRoute>}/>
-                <Route path ="/cadastroUsuario" element={<CadastroUsuario />}/>
+                <Route path ="/cadastro" element={<CadastroUsuario />}/>
                 <Route path ="/agendamento" element={<Agendamento />} />
             </Switch>
         </BrowserRouter>
