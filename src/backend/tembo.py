@@ -18,7 +18,7 @@ app = FastAPI()
 DATABASE_URL = os.getenv("URL")
 
 
-origins = ["http://localhost:5173","https://n702-henna.vercel.app/"]
+origins = ["http://localhost:5173","https://n702-henna.vercel.app"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
