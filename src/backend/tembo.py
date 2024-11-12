@@ -2,7 +2,7 @@ from fastapi import FastAPI,HTTPException
 import psycopg
 from pydantic import BaseModel
 from typing import Optional, List
-import datetime
+from datetime import date, datetime, time, timedelta
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
@@ -18,7 +18,7 @@ app = FastAPI()
 DATABASE_URL = os.getenv("URL")
 
 
-origins = ["http://localhost:5173"]
+origins = ["http://localhost:5173","https://n702-henna.vercel.app/"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -32,6 +32,22 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 class LoginData(BaseModel):
     username: str
     password: str
+
+class PessoaFisica(BaseModel):
+    nm_pessoa_fisica: str
+    ds_email: str
+    dt_nascimento: date
+    nr_cpf: str
+    nr_contato: str
+    ds_endereco: str
+    nr_numero_endereco: str
+    ds_senha: str
+    ie_sexo: str
+
+class DataAgendamento(BaseModel):
+    dt_agenda: date
+    hr_agenda: datetime
+    ie_status: str
 
 def db_connect():
     return psycopg.connect(DATABASE_URL)
@@ -83,3 +99,49 @@ def search_users():
             'EMAIL':i[6],
         })
     return jsonable_encoder(data)
+
+@app.post('/cadastro')
+def register_user(pf: PessoaFisica):
+    
+    pf.ds_senha = bcrypt.hashpw(pf.ds_senha.encode('utf-8'),bcrypt.gensalt())
+    if pf.ie_sexo == 'Masculino':
+        pf.ie_sexo = 'M'
+    elif pf.ie_sexo == 'Feminino':
+        pf.ie_sexo = 'F'
+    else:
+        pf.ie_sexo = 'I'
+    conn = db_connect()
+    cursor = conn.cursor()
+    values = (pf.nm_pessoa_fisica,pf.dt_nascimento,pf.ie_sexo,pf.nr_contato,pf.nr_cpf,pf.ds_senha,pf.ds_email,pf.ds_endereco,pf.nr_numero_endereco)
+    sql = "INSERT INTO pessoa_fisica(nm_pessoa_fisica,dt_nascimento,ie_sexo,nr_contato,nr_cpf,ds_senha,ds_email,ds_endereco,nr_numero_endereco) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+    try:
+        cursor.execute(sql, values)
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        raise e
+    finally:
+        cursor.close()
+        conn.close()
+    return {"status": "sucesso", "message": "Usuário cadastrado com sucesso!"}
+
+@app.get('/agendamento/{dt_agenda}')
+def search_date(dt_agenda: date):
+    conn = db_connect()
+    cursor = conn.cursor()
+    horarios = []
+    sql = "SELECT to_char(hr_agenda,'hh24:mi') FROM agenda_paciente WHERE dt_agenda = %s AND ie_status = 'Pendente' ORDER BY 1 ASC"
+    values = (dt_agenda,)
+    
+    try:
+        cursor.execute(sql, values)
+        data = cursor.fetchall()
+        for i in data:
+            horarios = [i[0] for i in data]
+    except Exception as e:
+        raise e
+    finally:
+        cursor.close()
+        conn.close()
+    
+    return jsonable_encoder(horarios)
