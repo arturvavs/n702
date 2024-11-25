@@ -53,3 +53,7 @@ export const getAvailableTimes = async (dt_agenda) => {
     }
   }
 };
+
+export const getPessoaFisicaId = () => {
+  return sessionStorage.getItem('cd_pessoa_fisica');
+};

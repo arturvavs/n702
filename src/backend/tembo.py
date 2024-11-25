@@ -49,6 +49,11 @@ class DataAgendamento(BaseModel):
     hr_agenda: datetime
     ie_status: str
 
+class AgendamentoConfirmacao(BaseModel):
+    dt_agenda: date
+    hr_agenda: str  # Hora no formato 'HH:MM'
+    cd_pessoa_fisica: int  # ID do usuário que está agendando
+
 def db_connect():
     return psycopg.connect(DATABASE_URL)
 
@@ -145,3 +150,28 @@ def search_date(dt_agenda: date):
         conn.close()
     
     return jsonable_encoder(horarios)
+
+@app.post('/confirmar-agendamento')
+def confirmar_agendamento(dados: AgendamentoConfirmacao):
+    conn = db_connect()
+    cursor = conn.cursor()
+    sql = """
+        UPDATE agenda_paciente
+        SET ie_status = 'Agendado', cd_pessoa_fisica = %s
+        WHERE dt_agenda = %s AND hr_agenda = %s AND ie_status = 'Pendente'
+    """
+    values = (dados.cd_pessoa_fisica, dados.dt_agenda, dados.hr_agenda)
+    
+    try:
+        cursor.execute(sql, values)
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Nenhum horário pendente encontrado para a data e horário fornecidos")
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=f"Erro ao confirmar agendamento: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+    
+    return {"status": "sucesso", "message": "Agendamento confirmado com sucesso"}
