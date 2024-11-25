@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { login } from '../../authService'
 import apiClient from "../../apiClient";
-//import Parse from "parse/dist/parse.min.js";
 import {
   FormControl,
   IconButton,
@@ -21,24 +20,27 @@ export const Login: React.FC = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  {/*handleLogin: função simples que realiza o login na aplicação, validação de usuário e senha fica no backend */}
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const data = await login(username, password);
-      console.log(data);
-      navigate("/agendamento"); // Redireciona após login bem-sucedido
+      const response = await login(username, password);
+      console.log(response);
+  
+      // Armazenando o cd_pessoa_fisica no localStorage
+      sessionStorage.setItem('cd_pessoa_fisica', response.user_id);
+      console.log("cd_pessoa_fisica",response.user_id)
+      navigate("/agendamento"); 
     } catch (error) {
-      // Verificar e converter o erro para o tipo Error, se possível
       if (error instanceof Error) {
-        setError(error.message); // Usa a mensagem de erro
+        setError(error.message);
       } else {
-        setError("Ocorreu um erro inesperado."); // Mensagem padrão para casos desconhecidos
+        setError("Ocorreu um erro inesperado.");
       }
     }
   };
 
-  {/*Bloco de instruções para funcionalidade do icone de exibir/ocultar a senha escrita no campo. Essa função já vem nativamente pronta do MUI5, apenas fiz alguns ajustes para adequard a lógica do componente Login.tsx */}
+  
   const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (
@@ -59,7 +61,7 @@ export const Login: React.FC = () => {
         {error && <p>{error}</p>}
         <form>
           <div className="mb-4">
-            <TextField //Componente importado da MUI5
+            <TextField 
               required
               fullWidth
               id="outlined-required"
@@ -69,24 +71,24 @@ export const Login: React.FC = () => {
             />
           </div>
           <div className="mb-6">
-            <FormControl variant="outlined" fullWidth> {/*Componente importado da MUI5 */}
-              <InputLabel htmlFor="outlined-adornment-password"> {/*Componente importado da MUI5 */}
+            <FormControl variant="outlined" fullWidth> 
+              <InputLabel htmlFor="outlined-adornment-password"> 
                 Senha *
               </InputLabel>
-              <OutlinedInput //Componente importado da MUI5 
+              <OutlinedInput
                 id="outlined-adornment-password"
                 type={showPassword ? "text" : "password"}
                 onChange={(e) => setPassword(e.target.value)}
                 endAdornment={
-                  <InputAdornment position="end"> {/*Componente importado da MUI5 */}
-                    <IconButton //Componente improtado da MUI5
+                  <InputAdornment position="end"> 
+                    <IconButton 
                       aria-label="toggle password visibility"
                       onClick={handleClickShowPassword}
                       onMouseDown={handleMouseDownPassword}
                       onMouseUp={handleMouseUpPassword}
                       edge="end"
                     >
-                      {showPassword ? <VisibilityOff /> : <Visibility />} {/*Aplicação da funcionalidade de exibição de senha, nativamente importada da MUI5*/}
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
                 }
