@@ -103,7 +103,7 @@ export const Login: React.FC = () => {
             Logar
           </button>
           <div className="text-center mt-4">
-            <a href="/cadastroUsuario" className="text-blue-500 hover:underline">
+            <a href="/cadastro" className="text-blue-500 hover:underline">
               Cadastre-se
             </a>
           </div>
