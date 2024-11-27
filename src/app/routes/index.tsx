@@ -8,7 +8,7 @@ export const Routes = () => {
     return (
         <BrowserRouter>
             <Switch>
-                <Route path ="/login" element={<Login />}/>
+                <Route path ="/" element={<Login />}/>
                 <Route path ="/cadastro" element={<CadastroUsuario />}/>
                 <Route path ="/agendamento" element={<Agendamento />} />
             </Switch>

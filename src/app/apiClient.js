@@ -2,7 +2,7 @@
 import axios from 'axios';
 //https://n702.onrender.com/
 const apiClient = axios.create({
-  baseURL: 'https://n702.onrender.com',
+  baseURL: 'https://n702.onrender.com/',
   headers: {
     'Content-Type': 'application/json',
   },
