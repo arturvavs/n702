@@ -58,22 +58,18 @@ def db_connect():
     return psycopg.connect(DATABASE_URL)
 
 
-@app.get('/')
-def homepage():
-    return {'message':'homepage'}
 
-
-@app.post('/login')
+@app.post('/')
 async def user_login(login: LoginData):
     conn = db_connect()
     cursor = conn.cursor()
     sql = "SELECT cd_pessoa_fisica, ds_senha FROM pessoa_fisica WHERE ds_email = %s"
-    cursor.execute(sql, (login.username,))  # Passando como uma tupla com vírgula
+    cursor.execute(sql, (login.username,))
     user = cursor.fetchone()
     conn.close()
     
     if user:
-        if login.password:  # Verifica se a senha foi fornecida
+        if login.password:
             password_hash = user[1]
             if bcrypt.checkpw(login.password.encode('utf-8'), password_hash):  # .encode('utf-8') vai servir para converter a senha em bytes
                 return JSONResponse(content={"message": "Login realizado com sucesso", "user_id": user[0]})

@@ -3,7 +3,7 @@ import apiClient from './apiClient';
 
 export const login = async (username, password) => {
   try {
-    const response = await apiClient.post('/login', { username, password });
+    const response = await apiClient.post('/', { username, password });
     return response.data; 
   } catch (error) {
     if (error.response && error.response.status === 401) {
