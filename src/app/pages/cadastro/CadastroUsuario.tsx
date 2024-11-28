@@ -35,7 +35,7 @@ export const CadastroUsuario: React.FC = () => {
       );
       if (response.status === 200) {
         // Navegar para outra página ou exibir uma mensagem de sucesso
-        navigate('/Login'); // Exemplo
+        navigate('/'); // Exemplo
       }
       } catch (err) {
       setError("Falha ao realizar cadastro");
